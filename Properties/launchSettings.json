@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "LinuxFind": {
+      "commandName": "Project",
+      "commandLineArgs": ". -name *.json -or -name *.pdb -not -name *.pdb"
+    }
+  }
+}
