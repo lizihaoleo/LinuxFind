@@ -1,6 +1,6 @@
 <h1> Linux Find Command Line </h1>
 <h4> This is a experiement project to understand OOP concepts and LL parser </h4>
-<h3> Support -size, -name, -maxdepth, -writetofile and logical connection words (-and, -or, -not)
+Support -size, -name, -maxdepth, -writetofile and logical connection words (-and, -or, -not)
 
     ./find.exe . -name *.txt -or -size +10MB -and -maxdepth 2 -writetofile tmp.txt
 
@@ -28,4 +28,3 @@ One main benefit of OOP is the project should be easy for extension�
 Also, one of the challenging parts for this project is to write a parser to support logical operator, and I implement a LL parser (recursive parser) in ExecutionGenerator class. 
 
 More LL parser referece in [here](https://zhuanlan.zhihu.com/p/31271879).
-</h3>
