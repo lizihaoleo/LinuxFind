@@ -2,7 +2,7 @@
 <h4> This is a experiment project to understand OOP concepts and LL parser </h4>
 Support -size, -name, -maxdepth, -writetofile and logical connection words (-and, -or, -not)
 
-    ./find.exe . -name *.txt -or -size +10MB -and -maxdepth 2 -writetofile tmp.txt
+    ./LinuxFind.exe . -name *.txt -or -size +10MB -and -maxdepth 2 -writetofile tmp.txt
 
 * Looking files recursively with max depth = 2, search file with .txt ending OR size greater than 10 Mb, then write the full path of files into tmp.txt
 
