@@ -1,21 +1,21 @@
 ﻿using LinuxFind.Bases;
-using LinuxFind.Filters;
+using LinuxFind.Options;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace LinuxFind.Parsers
 {
-    public class FileNameFilterParser : ParserBase
+    public class MaxDepthOptionParser : ParserBase
     {
         public override string getName()
         {
-            return "name";
+            return "maxdepth";
         }
 
         public override PlanNode parse(Stack<string> args)
         {
-            return new FileNameFilter(args.Pop());
+            return new MaxDepthOption(int.Parse(args.Pop()));
         }
     }
 }

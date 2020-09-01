@@ -1,21 +1,31 @@
-﻿using java.nio.file;
-using javax.imageio.spi;
-using LinuxFind.Bases;
+﻿using LinuxFind.Bases;
 using LinuxFind.Parsers;
 using LinuxFind.Parsers.LogicHelpers;
-using sun.tools.tree;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Path = java.nio.file.Path;
 
 namespace LinuxFind
 {
     public class ExecutionGenerator
     {
-        private static Dictionary<string, OptionParser> optionParserRegistry = new Dictionary<string, OptionParser>();
+        private static Dictionary<string, ParserBase> optionParserRegistry = new Dictionary<string, ParserBase>();
         private Stack<String> tokens = new Stack<string>();
+
+        public ExecutionGenerator()
+        {
+            register(new FileNameFilterParser());
+            register(new FileSizeFilterParser());
+            register(new MaxDepthOptionParser());
+            register(new WriteToFileActionParser());
+        }
+
+        private static void register(ParserBase parser)
+        {
+            optionParserRegistry.Add(parser.getName(), parser);
+        }
+
         public Executor generateExecutor(string[] args)
         {
             for (int i = args.Count() - 1; i >= 0; --i)
@@ -27,27 +37,41 @@ namespace LinuxFind
             {
                 throw new Exception("Requires at least one path argument");
             }
-            var filePath = new DirectoryInfo(tokens.Pop());
+            
+            var root = new DirectoryInfo(tokens.Pop());
 
-            List<FilterBase> logicalFilters = new List<FilterBase>();
-
+            List<FilterBase> filters = new List<FilterBase>(); // list of logfical helper
+            List<OptionBase> options = new List<OptionBase>();
+            List<ActionBase> actions = new List<ActionBase>();
 
             while (tokens.Count > 0)
             {
-                PlanNode logicalNode = parseOr();
-                switch (logicalNode.getKind())
+                // analysize next keyword (name, size, maxdepth) and parameter (*.txt, -1mb, 10)
+                // looking for instance of respective node from static dictionary in the class
+                PlanNode node = parseOr();
+                switch (node.getKind())
                 {
+                    case PlanNodeKind.OPTION:
+                        options.Add((OptionBase)node);
+                        break;
                     case PlanNodeKind.FILTER:
-                        logicalFilters.Add((FilterBase)logicalNode);
+                        filters.Add((FilterBase)node);
+                        break;
+                    case PlanNodeKind.ACTION:
+                        actions.Add((ActionBase)node);
                         break;
                     default:
-                        throw new Exception("Unsupport enum value " + logicalNode.getKind().ToString());
+                        throw new Exception("Unsupport enum value " + node.getKind().ToString());
                 }
             }
 
             tokens = null;
-            return new Executor(filePath, logicalFilters);
+            return new Executor(root,filters, options, actions);
         }
+
+
+        #region LL Parser
+        // LL Parse (递归下降解析器) https://zhuanlan.zhihu.com/p/31271879
 
         // parse "... -or ..." input
         private PlanNode parseOr()
@@ -122,7 +146,7 @@ namespace LinuxFind
             return new LogicalNot((FilterBase)operand);
         }
 
-        // parse expression inside "(...)" or base class for Option / Filter / Action
+        // parse expression inside "(...)" or base class for Filter
         private PlanNode parseAtom()
         {
             if (nextTokenIs("("))
@@ -147,7 +171,7 @@ namespace LinuxFind
             // 这个name就是参数名，例如-type的"type"，-size的"size"
             String name = tokens.Pop().Substring(1);
             // 在registry中找到与参数名对应的parser
-            OptionParser parser = optionParserRegistry.GetValueOrDefault(name);
+            ParserBase parser = optionParserRegistry.GetValueOrDefault(name);
             if (parser == null)
             {
                 throw new Exception("Unrecognized option " + name);
@@ -162,14 +186,7 @@ namespace LinuxFind
             return tokens.Count > 0 && value.Equals(tokens.Peek());
         }
 
-        public ExecutionGenerator()
-        {
-            Register(new FileNameFilterParser());
-        }
+        #endregion
 
-        private static void Register(OptionParser parser)
-        {
-            optionParserRegistry.Add(parser.getName(), parser);
-        }
     }
 }

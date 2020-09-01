@@ -1,21 +1,21 @@
-﻿using LinuxFind.Bases;
-using LinuxFind.Filters;
+﻿using LinuxFind.Actions;
+using LinuxFind.Bases;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace LinuxFind.Parsers
 {
-    public class FileNameFilterParser : ParserBase
+    public class WriteToFileActionParser : ParserBase
     {
         public override string getName()
         {
-            return "name";
+            return "writetofile";
         }
 
         public override PlanNode parse(Stack<string> args)
         {
-            return new FileNameFilter(args.Pop());
+            return new WriteToFileAction(args.Pop());
         }
     }
 }

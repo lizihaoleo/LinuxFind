@@ -3,13 +3,13 @@
     using System;
     using System.Collections.Generic;
 
-    // Option/Filter/Action的解析器基类
+    // Filter的解析器基类
     /// <summary>
-    /// Defines the <see cref="OptionParser" />.
+    /// Defines the <see cref="ParserBase" />.
     /// </summary>
-    public abstract class OptionParser
+    public abstract class ParserBase
     {
-        // 该解析器所处理的参数名，例如"maxdepth"，"type"，"size"
+        // 该解析器所处理的参数名，例如 "type"，"size"
         /// <summary>
         /// The getName.
         /// </summary>
